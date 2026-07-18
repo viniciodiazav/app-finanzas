@@ -7,14 +7,9 @@ import { PresupuestosLista } from '../components/PresupuestosLista';
 import { AhorroSeccion } from '../components/AhorroSeccion';
 import { GastoFijoSeccion } from '../components/GastoFijoSeccion';
 import { BackupBar } from '../components/BackupBar';
-import { ModalIngresoFijo } from '../components/ModalIngresoFijo';
-import { ModalPresupuestoCategoria } from '../components/ModalPresupuestoCategoria';
-import { ModalAhorro } from '../components/ModalAhorro';
-import { ModalIngresoExtra } from '../components/ModalIngresoExtra';
-import { ModalGastoFijo } from '../components/ModalGastoFijo';
+import { NavegacionSecundaria } from '../components/dashboard/NavegacionSecundaria';
+import { ModalesDashboard, type ModalActivo } from '../components/dashboard/ModalesDashboard';
 import { exportarDatos, importarDatos } from '../utils/backup';
-
-type ModalActivo = 'ingresoFijo' | 'presupuestoNuevo' | 'ahorro' | 'ingresoExtra' | 'gastoFijo' | null;
 
 interface DashboardRouteProps {
   finanzas: UseFinanzasReturn;
@@ -60,26 +55,7 @@ export function DashboardRoute({ finanzas }: DashboardRouteProps) {
         <Header claveMes={claveMes} onMesAnterior={mesAnterior} onMesSiguiente={mesSiguiente} />
 
         <main className="flex flex-col gap-4 px-4 mt-4">
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => navigate('/reporte')}
-              className="text-xs sm:text-sm font-semibold py-2.5 rounded-xl border border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100"
-            >
-              Reporte
-            </button>
-            <button
-              onClick={() => navigate('/estadisticas')}
-              className="text-xs sm:text-sm font-semibold py-2.5 rounded-xl border border-accent-200 bg-accent-50 text-accent-700 hover:bg-accent-100"
-            >
-              Estadísticas
-            </button>
-            <button
-              onClick={() => navigate('/historial')}
-              className="text-xs sm:text-sm font-semibold py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-            >
-              Historial
-            </button>
-          </div>
+          <NavegacionSecundaria />
 
           <IngresoSeccion
             ingresoFijo={mesActual.ingresoFijo}
@@ -124,49 +100,22 @@ export function DashboardRoute({ finanzas }: DashboardRouteProps) {
         />
       </div>
 
-      {modalActivo === 'ingresoFijo' && (
-        <ModalIngresoFijo
-          onGuardar={definirIngresoFijo}
-          onCerrar={() => setModalActivo(null)}
-        />
-      )}
-
-      {modalActivo === 'presupuestoNuevo' && (
-        <ModalPresupuestoCategoria
-          categorias={categorias}
-          ingresoFijo={mesActual.ingresoFijo}
-          disponibleParaPresupuestar={disponibleParaPresupuestar}
-          onCrearCategoria={agregarCategoria}
-          onGuardarNuevo={agregarPresupuestoCategoria}
-          onGuardarEdicion={editarPresupuestoCategoria}
-          onCerrar={() => setModalActivo(null)}
-        />
-      )}
-
-      {modalActivo === 'ahorro' && (
-        <ModalAhorro
-          ahorroExistente={ahorroDetalle}
-          ingresoFijo={mesActual.ingresoFijo}
-          disponibleParaPresupuestar={disponibleParaPresupuestar}
-          onGuardar={definirAhorro}
-          onCerrar={() => setModalActivo(null)}
-        />
-      )}
-
-      {modalActivo === 'ingresoExtra' && (
-        <ModalIngresoExtra
-          onGuardar={agregarIngresoExtra}
-          onCerrar={() => setModalActivo(null)}
-        />
-      )}
-
-      {modalActivo === 'gastoFijo' && (
-        <ModalGastoFijo
-          categorias={categoriasConPresupuesto}
-          onGuardar={agregarGastoFijo}
-          onCerrar={() => setModalActivo(null)}
-        />
-      )}
+      <ModalesDashboard
+        modalActivo={modalActivo}
+        onCerrar={() => setModalActivo(null)}
+        categorias={categorias}
+        categoriasConPresupuesto={categoriasConPresupuesto}
+        ingresoFijo={mesActual.ingresoFijo}
+        disponibleParaPresupuestar={disponibleParaPresupuestar}
+        ahorroDetalle={ahorroDetalle}
+        onDefinirIngresoFijo={definirIngresoFijo}
+        onCrearCategoria={agregarCategoria}
+        onGuardarPresupuestoNuevo={agregarPresupuestoCategoria}
+        onGuardarPresupuestoEdicion={editarPresupuestoCategoria}
+        onDefinirAhorro={definirAhorro}
+        onAgregarIngresoExtra={agregarIngresoExtra}
+        onAgregarGastoFijo={agregarGastoFijo}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Categoria, Gasto } from '../types/finanzas';
 import { formatoMoneda } from '../utils/formato';
 import { ConfirmDialog } from './ConfirmDialog';
+import { GastoListItem } from './GastoListItem';
 
 interface HistorialGastosScreenProps {
   gastos: Gasto[];
@@ -49,28 +50,17 @@ export function HistorialGastosScreen({
             ) : (
               <ul className="flex flex-col gap-2">
                 {gastosOrdenados.map((gasto) => (
-                  <li
+                  <GastoListItem
                     key={gasto.id}
-                    className="flex items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-medium text-slate-800 truncate">{gasto.descripcion}</p>
+                    gasto={gasto}
+                    subtitulo={
                       <p className="text-xs text-slate-500">
                         {nombreCategoria(gasto.categoriaId)}
                         {gasto.esFijo && <span className="ml-1 text-accent-600">· Fijo</span>}
                       </p>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="font-semibold text-slate-800">{formatoMoneda(gasto.monto)}</span>
-                      <button
-                        onClick={() => setGastoAEliminar(gasto)}
-                        aria-label="Eliminar gasto"
-                        className="text-slate-400 hover:text-red-500 text-lg leading-none"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </li>
+                    }
+                    onEliminar={setGastoAEliminar}
+                  />
                 ))}
               </ul>
             )}

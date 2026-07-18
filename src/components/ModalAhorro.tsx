@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal } from './Modal';
+import { ModoValorToggle } from './ModoValorToggle';
 import type { AhorroDetalle, ModoPresupuesto } from '../types/finanzas';
 import { formatoMoneda } from '../utils/formato';
 
@@ -55,30 +56,7 @@ export function ModalAhorro({
   return (
     <Modal titulo={ahorroExistente ? 'Editar ahorro mensual' : 'Definir ahorro mensual'} onCerrar={onCerrar}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setModo('monto')}
-            className={`flex-1 text-sm font-semibold py-2 rounded-lg border ${
-              modo === 'monto'
-                ? 'bg-pink-600 text-white border-pink-600'
-                : 'bg-white text-slate-600 border-slate-200'
-            }`}
-          >
-            Monto
-          </button>
-          <button
-            type="button"
-            onClick={() => setModo('porcentaje')}
-            className={`flex-1 text-sm font-semibold py-2 rounded-lg border ${
-              modo === 'porcentaje'
-                ? 'bg-pink-600 text-white border-pink-600'
-                : 'bg-white text-slate-600 border-slate-200'
-            }`}
-          >
-            Porcentaje
-          </button>
-        </div>
+        <ModoValorToggle modo={modo} onCambiar={setModo} colorActivo="pink" />
 
         <div>
           <label className="block text-sm font-medium text-slate-600 mb-1">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal } from './Modal';
+import { ModoValorToggle } from './ModoValorToggle';
 import type { Categoria, ModoPresupuesto, PresupuestoDetalle } from '../types/finanzas';
 import { formatoMoneda } from '../utils/formato';
 
@@ -100,30 +101,7 @@ export function ModalPresupuestoCategoria({
           )}
         </div>
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setModo('monto')}
-            className={`flex-1 text-sm font-semibold py-2 rounded-lg border ${
-              modo === 'monto'
-                ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-white text-slate-600 border-slate-200'
-            }`}
-          >
-            Monto
-          </button>
-          <button
-            type="button"
-            onClick={() => setModo('porcentaje')}
-            className={`flex-1 text-sm font-semibold py-2 rounded-lg border ${
-              modo === 'porcentaje'
-                ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-white text-slate-600 border-slate-200'
-            }`}
-          >
-            Porcentaje
-          </button>
-        </div>
+        <ModoValorToggle modo={modo} onCambiar={setModo} colorActivo="brand" />
 
         <div>
           <label className="block text-sm font-medium text-slate-600 mb-1">

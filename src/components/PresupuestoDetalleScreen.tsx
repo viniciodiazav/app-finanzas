@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Gasto, PresupuestoDetalle } from '../types/finanzas';
 import { formatoMoneda } from '../utils/formato';
 import { ConfirmDialog } from './ConfirmDialog';
+import { GastoListItem } from './GastoListItem';
 
 interface PresupuestoDetalleScreenProps {
   presupuesto: PresupuestoDetalle;
@@ -95,25 +96,12 @@ export function PresupuestoDetalleScreen({
             ) : (
               <ul className="flex flex-col gap-2">
                 {gastosOrdenados.map((gasto) => (
-                  <li
+                  <GastoListItem
                     key={gasto.id}
-                    className="flex items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-medium text-slate-800 truncate">{gasto.descripcion}</p>
-                      {gasto.esFijo && <p className="text-xs text-accent-600">Fijo</p>}
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="font-semibold text-slate-800">{formatoMoneda(gasto.monto)}</span>
-                      <button
-                        onClick={() => setGastoAEliminar(gasto)}
-                        aria-label="Eliminar gasto"
-                        className="text-slate-400 hover:text-red-500 text-lg leading-none"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </li>
+                    gasto={gasto}
+                    subtitulo={gasto.esFijo && <p className="text-xs text-accent-600">Fijo</p>}
+                    onEliminar={setGastoAEliminar}
+                  />
                 ))}
               </ul>
             )}
