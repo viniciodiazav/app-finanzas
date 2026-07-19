@@ -26,6 +26,7 @@ describe('PresupuestosLista', () => {
         presupuestos={[]}
         totalPresupuestado={0}
         ingresoFijo={0}
+        montoAhorro={0}
         onAgregarPresupuesto={vi.fn()}
         onVerDetalle={vi.fn()}
       />
@@ -41,6 +42,7 @@ describe('PresupuestosLista', () => {
         presupuestos={[presupuesto()]}
         totalPresupuestado={3000}
         ingresoFijo={20000}
+        montoAhorro={0}
         onAgregarPresupuesto={vi.fn()}
         onVerDetalle={onVerDetalle}
       />
@@ -57,6 +59,7 @@ describe('PresupuestosLista', () => {
         presupuestos={[presupuesto({ sobregasto: true, restante: -100 })]}
         totalPresupuestado={3000}
         ingresoFijo={20000}
+        montoAhorro={0}
         onAgregarPresupuesto={vi.fn()}
         onVerDetalle={vi.fn()}
       />
@@ -72,6 +75,7 @@ describe('PresupuestosLista', () => {
         presupuestos={[]}
         totalPresupuestado={0}
         ingresoFijo={0}
+        montoAhorro={0}
         onAgregarPresupuesto={onAgregarPresupuesto}
         onVerDetalle={vi.fn()}
       />
@@ -79,5 +83,21 @@ describe('PresupuestosLista', () => {
 
     fireEvent.click(screen.getByText('+ Nuevo presupuesto'));
     expect(onAgregarPresupuesto).toHaveBeenCalled();
+  });
+
+  it('descuenta el ahorro del ingreso fijo mostrado como total disponible para asignar', () => {
+    render(
+      <PresupuestosLista
+        presupuestos={[presupuesto()]}
+        totalPresupuestado={3000}
+        ingresoFijo={20000}
+        montoAhorro={5000}
+        onAgregarPresupuesto={vi.fn()}
+        onVerDetalle={vi.fn()}
+      />
+    );
+
+    // 20000 de ingreso fijo - 5000 ya apartados para ahorro = 15000 realmente disponibles.
+    expect(screen.getByText('Asignado: $3,000.00 de $15,000.00')).toBeInTheDocument();
   });
 });

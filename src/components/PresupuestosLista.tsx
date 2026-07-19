@@ -5,6 +5,7 @@ interface PresupuestosListaProps {
   presupuestos: PresupuestoDetalle[];
   totalPresupuestado: number;
   ingresoFijo: number;
+  montoAhorro: number;
   onAgregarPresupuesto: () => void;
   onVerDetalle: (id: string) => void;
 }
@@ -13,6 +14,7 @@ export function PresupuestosLista({
   presupuestos,
   totalPresupuestado,
   ingresoFijo,
+  montoAhorro,
   onAgregarPresupuesto,
   onVerDetalle,
 }: PresupuestosListaProps) {
@@ -24,7 +26,7 @@ export function PresupuestosLista({
 
       {ingresoFijo > 0 && (
         <p className="text-xs text-slate-400 mb-3">
-          Asignado: {formatoMoneda(totalPresupuestado)} de {formatoMoneda(ingresoFijo)}
+          Asignado: {formatoMoneda(totalPresupuestado)} de {formatoMoneda(ingresoFijo - montoAhorro)}
         </p>
       )}
 

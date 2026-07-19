@@ -80,6 +80,7 @@ export function DashboardRoute({ finanzas }: DashboardRouteProps) {
             presupuestos={presupuestosDetalle}
             totalPresupuestado={totalPresupuestado}
             ingresoFijo={mesActual.ingresoFijo}
+            montoAhorro={montoAhorro}
             onAgregarPresupuesto={() => setModalActivo('presupuestoNuevo')}
             onVerDetalle={(id) => navigate(`/presupuestos/${id}`)}
           />
