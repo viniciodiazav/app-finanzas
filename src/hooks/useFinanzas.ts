@@ -11,7 +11,7 @@ import { useFinanzasDerivados } from './finanzas/useFinanzasDerivados';
 
 export function useFinanzas(userId: string | null = null) {
   const { data, persistir, restaurarDatos, cargando } = usePersistencia(userId);
-  const { claveMes, mesActual, irAMes, mesAnterior, mesSiguiente } = useMesNavegacion(data, persistir);
+  const { claveMes, mesActual, irAMes, mesAnterior, mesSiguiente } = useMesNavegacion(data, persistir, cargando);
   const { definirIngresoFijo } = useIngresoFijo(claveMes, mesActual, persistir);
   const { agregarPresupuestoCategoria, editarPresupuestoCategoria, eliminarPresupuestoCategoria } =
     usePresupuestos(claveMes, data, persistir);

@@ -5,7 +5,7 @@ import { esGastoFijoActivoEnMes, estaVencido } from '../../utils/gastosFijos';
 import { crearId, crearMesVacio } from './helpers';
 import type { Persistir } from './types';
 
-export function useMesNavegacion(data: FinanzasData, persistir: Persistir) {
+export function useMesNavegacion(data: FinanzasData, persistir: Persistir, cargando: boolean) {
   const [claveMes, setClaveMes] = useState<string>(() => claveMesActual());
 
   const asegurarMes = useCallback((clave: string) => {
@@ -54,10 +54,14 @@ export function useMesNavegacion(data: FinanzasData, persistir: Persistir) {
   }, [claveMes, irAMes]);
 
   useEffect(() => {
+    // Mientras `cargando` es true, `data` puede ser un snapshot local que todavía no
+    // se reconcilió con lo remoto (ver usePersistencia). Crear el mes aquí antes de
+    // que llegue lo remoto lo sobreescribiría con datos vacíos.
+    if (cargando) return;
     if (!data.meses[claveMes]) {
       asegurarMes(claveMes);
     }
-  }, [claveMes, data.meses, asegurarMes]);
+  }, [claveMes, data.meses, asegurarMes, cargando]);
 
   const mesActual: DatosMes = data.meses[claveMes] ?? crearMesVacio(claveMes);
 
