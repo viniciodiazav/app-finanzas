@@ -5,6 +5,7 @@ import { PresupuestoDetalleRoute } from './routes/PresupuestoDetalleRoute';
 import { EstadisticasRoute } from './routes/EstadisticasRoute';
 import { HistorialRoute } from './routes/HistorialRoute';
 import { ReporteRoute } from './routes/ReporteRoute';
+import { CategoriasRoute } from './routes/CategoriasRoute';
 
 function App() {
   const finanzas = useFinanzas();
@@ -16,6 +17,7 @@ function App() {
       <Route path="/estadisticas" element={<EstadisticasRoute finanzas={finanzas} />} />
       <Route path="/historial" element={<HistorialRoute finanzas={finanzas} />} />
       <Route path="/reporte" element={<ReporteRoute finanzas={finanzas} />} />
+      <Route path="/categorias" element={<CategoriasRoute finanzas={finanzas} />} />
     </Routes>
   );
 }

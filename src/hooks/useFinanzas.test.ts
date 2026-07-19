@@ -177,6 +177,104 @@ describe('ahorro mensual comparte el límite con los presupuestos', () => {
   });
 });
 
+describe('gestión de categorías', () => {
+  it('renombra una categoría existente', () => {
+    const { result } = renderHook(() => useFinanzas());
+    let comida = '';
+
+    act(() => {
+      comida = result.current.agregarCategoria('Comida').id!;
+    });
+    act(() => {
+      const r = result.current.editarCategoria(comida, 'Comida y bebidas');
+      expect(r.ok).toBe(true);
+    });
+
+    expect(result.current.categorias.find((c) => c.id === comida)?.nombre).toBe('Comida y bebidas');
+  });
+
+  it('rechaza renombrar a un nombre que ya existe en otra categoría', () => {
+    const { result } = renderHook(() => useFinanzas());
+    let comida = '';
+
+    act(() => {
+      comida = result.current.agregarCategoria('Comida').id!;
+    });
+    act(() => {
+      result.current.agregarCategoria('Transporte');
+    });
+    act(() => {
+      const r = result.current.editarCategoria(comida, 'Transporte');
+      expect(r.ok).toBe(false);
+    });
+
+    expect(result.current.categorias.find((c) => c.id === comida)?.nombre).toBe('Comida');
+  });
+
+  it('elimina una categoría que no está en uso', () => {
+    const { result } = renderHook(() => useFinanzas());
+    let comida = '';
+
+    act(() => {
+      comida = result.current.agregarCategoria('Comida').id!;
+    });
+    act(() => {
+      const r = result.current.eliminarCategoria(comida);
+      expect(r.ok).toBe(true);
+    });
+
+    expect(result.current.categorias).toHaveLength(0);
+  });
+
+  it('no permite eliminar una categoría con un presupuesto asociado', () => {
+    const { result } = renderHook(() => useFinanzas());
+    let comida = '';
+
+    act(() => {
+      result.current.definirIngresoFijo(10000);
+    });
+    act(() => {
+      comida = result.current.agregarCategoria('Comida').id!;
+    });
+    act(() => {
+      result.current.agregarPresupuestoCategoria(comida, 'monto', 3000);
+    });
+    act(() => {
+      const r = result.current.eliminarCategoria(comida);
+      expect(r.ok).toBe(false);
+    });
+
+    expect(result.current.categorias).toHaveLength(1);
+    expect(result.current.categoriasConUso.find((c) => c.id === comida)?.enUso).toBe(true);
+  });
+
+  it('no permite eliminar una categoría con un gasto fijo asociado', () => {
+    const { result } = renderHook(() => useFinanzas());
+    let comida = '';
+    let presupuestoId = '';
+
+    act(() => {
+      result.current.definirIngresoFijo(10000);
+    });
+    act(() => {
+      comida = result.current.agregarCategoria('Comida').id!;
+    });
+    act(() => {
+      presupuestoId = result.current.agregarPresupuestoCategoria(comida, 'monto', 3000).id!;
+    });
+    act(() => {
+      result.current.agregarGastoFijo(300, 'Netflix', comida, null);
+    });
+    act(() => {
+      result.current.eliminarPresupuestoCategoria(presupuestoId);
+    });
+    act(() => {
+      const r = result.current.eliminarCategoria(comida);
+      expect(r.ok).toBe(false);
+    });
+  });
+});
+
 describe('gastos fijos: generación y expiración', () => {
   it('se genera en el mes de inicio, se repite mientras dure, y desaparece al vencer', () => {
     const { result } = renderHook(() => useFinanzas());

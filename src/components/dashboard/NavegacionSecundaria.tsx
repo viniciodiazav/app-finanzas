@@ -4,7 +4,7 @@ export function NavegacionSecundaria() {
   const navigate = useNavigate();
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 gap-2">
       <button
         onClick={() => navigate('/reporte')}
         className="text-xs sm:text-sm font-semibold py-2.5 rounded-xl border border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100"
@@ -22,6 +22,12 @@ export function NavegacionSecundaria() {
         className="text-xs sm:text-sm font-semibold py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
       >
         Historial
+      </button>
+      <button
+        onClick={() => navigate('/categorias')}
+        className="text-xs sm:text-sm font-semibold py-2.5 rounded-xl border border-pink-200 bg-pink-50 text-pink-700 hover:bg-pink-100"
+      >
+        Categorías
       </button>
     </div>
   );

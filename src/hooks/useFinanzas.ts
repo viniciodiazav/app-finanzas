@@ -17,7 +17,7 @@ export function useFinanzas() {
     usePresupuestos(claveMes, data, persistir);
   const { definirAhorro, eliminarAhorro } = useAhorro(claveMes, data, persistir);
   const { agregarIngresoExtra, eliminarIngresoExtra } = useIngresosExtra(claveMes, persistir);
-  const { agregarCategoria } = useCategorias(persistir);
+  const { agregarCategoria, editarCategoria, eliminarCategoria, categoriasConUso } = useCategorias(data, persistir);
   const { agregarGasto, eliminarGasto } = useGastos(claveMes, persistir);
   const { agregarGastoFijo, eliminarGastoFijo } = useGastosFijos(claveMes, persistir);
   const derivados = useFinanzasDerivados(mesActual, data.categorias);
@@ -40,6 +40,9 @@ export function useFinanzas() {
     agregarIngresoExtra,
     eliminarIngresoExtra,
     agregarCategoria,
+    editarCategoria,
+    eliminarCategoria,
+    categoriasConUso,
     agregarGasto,
     eliminarGasto,
     agregarGastoFijo,

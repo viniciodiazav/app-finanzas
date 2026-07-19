@@ -1,4 +1,4 @@
-import type { DatosMes } from '../../types/finanzas';
+import type { DatosMes, FinanzasData } from '../../types/finanzas';
 import { montoDePresupuesto } from '../../utils/presupuesto';
 
 export function crearId(): string {
@@ -22,4 +22,14 @@ export function montoAhorroDe(mes: DatosMes): number {
 
 export function totalMontoPresupuestos(mes: DatosMes): number {
   return mes.presupuestos.reduce((acc, p) => acc + montoDePresupuesto(p, mes.ingresoFijo), 0);
+}
+
+export function categoriaEstaEnUso(data: FinanzasData, categoriaId: string): boolean {
+  const enGastosFijos = data.gastosFijos.some((gf) => gf.categoriaId === categoriaId);
+  if (enGastosFijos) return true;
+  return Object.values(data.meses).some(
+    (mes) =>
+      mes.presupuestos.some((p) => p.categoriaId === categoriaId) ||
+      mes.gastos.some((g) => g.categoriaId === categoriaId)
+  );
 }
