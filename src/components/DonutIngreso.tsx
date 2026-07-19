@@ -43,7 +43,7 @@ export function DonutIngreso({
   const excedido = totalGastos > totalPresupuestado;
 
   return (
-    <div className="flex items-center gap-3 shrink-0">
+    <div className="flex flex-col items-center gap-2 shrink-0">
       <div
         className="w-16 h-16 rounded-full shrink-0"
         style={{ background: gradiente }}
@@ -54,7 +54,7 @@ export function DonutIngreso({
           <div className="w-9 h-9 rounded-full bg-white" />
         </div>
       </div>
-      <ul className="flex flex-col gap-0.5 text-[11px] text-slate-600">
+      <ul className="flex flex-col items-center gap-0.5 text-[11px] text-slate-600">
         <li className="flex items-center gap-1.5">
           <span className="inline-block w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: COLOR_GASTADO }} />
           Gastado {formatoMoneda(gastado)}
