@@ -5,7 +5,7 @@ import { BackupBar } from './BackupBar';
 describe('BackupBar', () => {
   it('llama a onExportar al hacer click en exportar', () => {
     const onExportar = vi.fn();
-    render(<BackupBar onExportar={onExportar} onImportar={vi.fn()} />);
+    render(<BackupBar onExportar={onExportar} onImportar={vi.fn()} onCerrarSesion={vi.fn()} />);
 
     fireEvent.click(screen.getByText('Exportar respaldo'));
     expect(onExportar).toHaveBeenCalled();
@@ -13,7 +13,9 @@ describe('BackupBar', () => {
 
   it('pide confirmación antes de importar y no llama a onImportar hasta confirmar', () => {
     const onImportar = vi.fn();
-    const { container } = render(<BackupBar onExportar={vi.fn()} onImportar={onImportar} />);
+    const { container } = render(
+      <BackupBar onExportar={vi.fn()} onImportar={onImportar} onCerrarSesion={vi.fn()} />
+    );
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     const archivo = new File(['{}'], 'respaldo.json', { type: 'application/json' });
@@ -28,7 +30,9 @@ describe('BackupBar', () => {
 
   it('no llama a onImportar si se cancela la confirmación', () => {
     const onImportar = vi.fn();
-    const { container } = render(<BackupBar onExportar={vi.fn()} onImportar={onImportar} />);
+    const { container } = render(
+      <BackupBar onExportar={vi.fn()} onImportar={onImportar} onCerrarSesion={vi.fn()} />
+    );
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     const archivo = new File(['{}'], 'respaldo.json', { type: 'application/json' });
@@ -37,5 +41,13 @@ describe('BackupBar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(onImportar).not.toHaveBeenCalled();
     expect(screen.queryByText(/respaldo\.json/)).not.toBeInTheDocument();
+  });
+
+  it('llama a onCerrarSesion al hacer click en cerrar sesión', () => {
+    const onCerrarSesion = vi.fn();
+    render(<BackupBar onExportar={vi.fn()} onImportar={vi.fn()} onCerrarSesion={onCerrarSesion} />);
+
+    fireEvent.click(screen.getByText('Cerrar sesión'));
+    expect(onCerrarSesion).toHaveBeenCalled();
   });
 });

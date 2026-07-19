@@ -5,7 +5,8 @@ import { DashboardRoute } from './DashboardRoute';
 import { crearHarnessFinanzas } from '../test/crearHarnessFinanzas';
 import type { FinanzasData } from '../types/finanzas';
 
-const Harness = crearHarnessFinanzas(DashboardRoute);
+const onCerrarSesion = vi.fn();
+const Harness = crearHarnessFinanzas(DashboardRoute, { onCerrarSesion });
 
 function seed(data: FinanzasData) {
   localStorage.setItem('finanzas-app-data', JSON.stringify(data));

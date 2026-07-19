@@ -4,12 +4,15 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
+import { AuthGate } from './components/AuthGate.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <App />
+        <AuthGate>
+          {(userId, signOut) => <App userId={userId} onCerrarSesion={signOut} />}
+        </AuthGate>
       </BrowserRouter>
     </ErrorBoundary>
   </StrictMode>,

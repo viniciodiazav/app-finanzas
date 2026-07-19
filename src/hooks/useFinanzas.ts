@@ -9,8 +9,8 @@ import { useGastos } from './finanzas/useGastos';
 import { useGastosFijos } from './finanzas/useGastosFijos';
 import { useFinanzasDerivados } from './finanzas/useFinanzasDerivados';
 
-export function useFinanzas() {
-  const { data, persistir, restaurarDatos } = usePersistencia();
+export function useFinanzas(userId: string | null = null) {
+  const { data, persistir, restaurarDatos, cargando } = usePersistencia(userId);
   const { claveMes, mesActual, irAMes, mesAnterior, mesSiguiente } = useMesNavegacion(data, persistir);
   const { definirIngresoFijo } = useIngresoFijo(claveMes, mesActual, persistir);
   const { agregarPresupuestoCategoria, editarPresupuestoCategoria, eliminarPresupuestoCategoria } =
@@ -48,6 +48,7 @@ export function useFinanzas() {
     agregarGastoFijo,
     eliminarGastoFijo,
     restaurarDatos,
+    cargando,
     ...derivados,
   };
 }

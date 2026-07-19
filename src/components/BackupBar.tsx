@@ -4,9 +4,10 @@ import { ConfirmDialog } from './ConfirmDialog';
 interface BackupBarProps {
   onExportar: () => void;
   onImportar: (archivo: File) => void;
+  onCerrarSesion: () => void;
 }
 
-export function BackupBar({ onExportar, onImportar }: BackupBarProps) {
+export function BackupBar({ onExportar, onImportar, onCerrarSesion }: BackupBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [archivoPendiente, setArchivoPendiente] = useState<File | null>(null);
 
@@ -21,6 +22,10 @@ export function BackupBar({ onExportar, onImportar }: BackupBarProps) {
         className="hover:text-accent-600 underline underline-offset-2"
       >
         Importar respaldo
+      </button>
+      <span className="text-slate-300">|</span>
+      <button onClick={onCerrarSesion} className="hover:text-red-500 underline underline-offset-2">
+        Cerrar sesión
       </button>
       <input
         ref={inputRef}

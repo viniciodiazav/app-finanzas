@@ -13,9 +13,10 @@ import { exportarDatos, importarDatos } from '../utils/backup';
 
 interface DashboardRouteProps {
   finanzas: UseFinanzasReturn;
+  onCerrarSesion: () => void;
 }
 
-export function DashboardRoute({ finanzas }: DashboardRouteProps) {
+export function DashboardRoute({ finanzas, onCerrarSesion }: DashboardRouteProps) {
   const {
     data,
     claveMes,
@@ -98,6 +99,7 @@ export function DashboardRoute({ finanzas }: DashboardRouteProps) {
               alert(e instanceof Error ? e.message : 'Error al importar el archivo.');
             }
           }}
+          onCerrarSesion={onCerrarSesion}
         />
       </div>
 
