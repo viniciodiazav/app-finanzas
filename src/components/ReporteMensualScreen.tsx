@@ -36,7 +36,8 @@ export function ReporteMensualScreen({
   onVolver,
 }: ReporteMensualScreenProps) {
   const estado = estadoTemporalMes(claveMes);
-  const restante = ingresoTotal - totalGastos;
+  const montoAhorro = ahorro?.monto ?? 0;
+  const restante = ingresoTotal - totalGastos - montoAhorro;
   const positivo = restante >= 0;
 
   const tasaAhorro = ingresoTotal > 0 ? (restante / ingresoTotal) * 100 : 0;
