@@ -33,7 +33,7 @@ describe('usePersistencia sin userId (modo local, como en los tests existentes)'
 });
 
 describe('usePersistencia con userId (modo remoto)', () => {
-  it('usa los datos remotos como fuente de verdad cuando ya existe una fila', async () => {
+  it('usa los datos remotos como fuente de verdad cuando ya existe una fila, y los cachea en una llave propia del usuario', async () => {
     const datosRemotos = { categorias: [{ id: 'c1', nombre: 'Comida' }], gastosFijos: [], meses: {} };
     maybeSingle.mockResolvedValue({ data: { data: datosRemotos }, error: null });
 
@@ -44,23 +44,47 @@ describe('usePersistencia con userId (modo remoto)', () => {
     await waitFor(() => expect(result.current.cargando).toBe(false));
 
     expect(result.current.data).toEqual(datosRemotos);
-    expect(JSON.parse(localStorage.getItem('finanzas-app-data')!)).toEqual(datosRemotos);
+    expect(JSON.parse(localStorage.getItem('finanzas-app-data:user-1')!)).toEqual(datosRemotos);
   });
 
-  it('siembra Supabase con los datos locales cuando el usuario no tiene fila remota todavía', async () => {
-    const datosLocales = { categorias: [{ id: 'c1', nombre: 'Ocio' }], gastosFijos: [], meses: {} };
-    localStorage.setItem('finanzas-app-data', JSON.stringify(datosLocales));
+  it('siembra Supabase con los datos previos sin cuenta cuando el usuario no tiene fila remota todavía, y los consume', async () => {
+    const datosPrevios = { categorias: [{ id: 'c1', nombre: 'Ocio' }], gastosFijos: [], meses: {} };
+    localStorage.setItem('finanzas-app-data', JSON.stringify(datosPrevios));
     maybeSingle.mockResolvedValue({ data: null, error: null });
 
     const { result } = renderHook(() => usePersistencia('user-1'));
 
     await waitFor(() => expect(result.current.cargando).toBe(false));
 
-    expect(upsert).toHaveBeenCalledWith({ user_id: 'user-1', data: datosLocales });
-    expect(result.current.data).toEqual(datosLocales);
+    expect(upsert).toHaveBeenCalledWith({ user_id: 'user-1', data: datosPrevios });
+    expect(result.current.data).toEqual(datosPrevios);
+    expect(JSON.parse(localStorage.getItem('finanzas-app-data:user-1')!)).toEqual(datosPrevios);
+    // La llave sin dueño se consume para que no se filtre a otra cuenta después.
+    expect(localStorage.getItem('finanzas-app-data')).toBeNull();
   });
 
-  it('cada persistir hace upsert a Supabase con los datos nuevos', async () => {
+  it('no filtra los datos de una cuenta a otra cuenta distinta en el mismo navegador', async () => {
+    const datosCuentaA = { categorias: [{ id: 'c1', nombre: 'Cuenta A' }], gastosFijos: [], meses: {} };
+    localStorage.setItem('finanzas-app-data', JSON.stringify(datosCuentaA));
+    maybeSingle.mockResolvedValue({ data: null, error: null });
+
+    const primeraSesion = renderHook(() => usePersistencia('user-a'));
+    await waitFor(() => expect(primeraSesion.result.current.cargando).toBe(false));
+    expect(primeraSesion.result.current.data).toEqual(datosCuentaA);
+    primeraSesion.unmount();
+
+    // Cuenta distinta, sin fila remota tampoco: no debe heredar los datos de la cuenta A,
+    // porque la llave sin dueño ya se consumió y la de user-b nunca existió.
+    upsert.mockClear();
+    maybeSingle.mockResolvedValue({ data: null, error: null });
+    const segundaSesion = renderHook(() => usePersistencia('user-b'));
+    await waitFor(() => expect(segundaSesion.result.current.cargando).toBe(false));
+
+    expect(segundaSesion.result.current.data).toEqual({ categorias: [], gastosFijos: [], meses: {} });
+    expect(upsert).toHaveBeenCalledWith({ user_id: 'user-b', data: { categorias: [], gastosFijos: [], meses: {} } });
+  });
+
+  it('cada persistir hace upsert a Supabase y guarda en la llave propia del usuario', async () => {
     maybeSingle.mockResolvedValue({ data: null, error: null });
     const { result } = renderHook(() => usePersistencia('user-1'));
 
@@ -78,5 +102,8 @@ describe('usePersistencia con userId (modo remoto)', () => {
     const llamada = upsert.mock.calls[0][0];
     expect(llamada.user_id).toBe('user-1');
     expect(llamada.data.categorias).toEqual([{ id: 'nueva', nombre: 'Nueva' }]);
+    expect(JSON.parse(localStorage.getItem('finanzas-app-data:user-1')!).categorias).toEqual([
+      { id: 'nueva', nombre: 'Nueva' },
+    ]);
   });
 });
