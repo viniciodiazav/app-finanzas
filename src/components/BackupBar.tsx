@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface BackupBarProps {
   onExportar: () => void;
@@ -7,6 +8,7 @@ interface BackupBarProps {
 
 export function BackupBar({ onExportar, onImportar }: BackupBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [archivoPendiente, setArchivoPendiente] = useState<File | null>(null);
 
   return (
     <div className="flex items-center justify-center gap-4 py-3 text-xs text-slate-500">
@@ -27,10 +29,23 @@ export function BackupBar({ onExportar, onImportar }: BackupBarProps) {
         className="hidden"
         onChange={(e) => {
           const archivo = e.target.files?.[0];
-          if (archivo) onImportar(archivo);
+          if (archivo) setArchivoPendiente(archivo);
           e.target.value = '';
         }}
       />
+
+      {archivoPendiente && (
+        <ConfirmDialog
+          titulo="Importar respaldo"
+          mensaje={`Esto reemplazará todos tus datos actuales con el contenido de "${archivoPendiente.name}". Esta acción no se puede deshacer. ¿Continuar?`}
+          textoConfirmar="Importar y reemplazar"
+          onConfirmar={() => {
+            onImportar(archivoPendiente);
+            setArchivoPendiente(null);
+          }}
+          onCancelar={() => setArchivoPendiente(null)}
+        />
+      )}
     </div>
   );
 }

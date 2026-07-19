@@ -3,11 +3,18 @@ import { Modal } from './Modal';
 interface ConfirmDialogProps {
   titulo?: string;
   mensaje: string;
+  textoConfirmar?: string;
   onConfirmar: () => void;
   onCancelar: () => void;
 }
 
-export function ConfirmDialog({ titulo = 'Confirmar eliminación', mensaje, onConfirmar, onCancelar }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  titulo = 'Confirmar eliminación',
+  mensaje,
+  textoConfirmar = 'Eliminar',
+  onConfirmar,
+  onCancelar,
+}: ConfirmDialogProps) {
   return (
     <Modal titulo={titulo} onCerrar={onCancelar}>
       <div className="flex flex-col gap-4">
@@ -25,7 +32,7 @@ export function ConfirmDialog({ titulo = 'Confirmar eliminación', mensaje, onCo
             onClick={onConfirmar}
             className="flex-1 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700"
           >
-            Eliminar
+            {textoConfirmar}
           </button>
         </div>
       </div>
