@@ -1,6 +1,6 @@
 # Mis Finanzas
 
-App de finanzas personales para un solo usuario (correo + contraseña propia). React 19 + TypeScript + Vite + Tailwind 4, con Supabase como backend (auth + persistencia). Desplegada en Netlify. Repo: `viniciodiazav/app-finanzas` en GitHub.
+App de finanzas personales multi-usuario (varias personas, cada una con su propia cuenta de usuario + contraseña). React 19 + TypeScript + Vite + Tailwind 4, con Supabase como backend (auth + persistencia). Desplegada en Netlify. Repo: `viniciodiazav/app-finanzas` en GitHub.
 
 ## Qué hace
 
@@ -16,7 +16,9 @@ Ingreso fijo mensual (se define una sola vez por mes, inmutable), presupuestos p
 ## Autenticación y persistencia (Supabase)
 
 - `src/lib/supabaseClient.ts`: cliente único. Usa `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` con fallback a placeholders si faltan, **a propósito**, para que importar el módulo no truene en tests o en dev sin `.env.local` — solo falla si de verdad se intenta usar sin credenciales reales.
-- `src/hooks/useAuth.ts` + `src/components/LoginScreen.tsx` + `src/components/AuthGate.tsx`: sesión, login/signup por correo y contraseña. `AuthGate` envuelve `<App userId={...} onCerrarSesion={...}>` en `main.tsx` (dentro de `ErrorBoundary` y `BrowserRouter`).
+- **Login es usuario + contraseña, no correo real**: Supabase Auth solo tiene identidades por correo, así que `src/hooks/useAuth.ts` convierte cada nombre de usuario en un correo sintético bajo un dominio ficticio (`usuario@misfinanzas.local`, ver `usernameAEmail` en ese archivo) y lo usa para `signInWithPassword`/`signUp`. Esto también da gratis la validación de usuario duplicado (Supabase ya rechaza correos repetidos). `LoginScreen.tsx` valida el formato del usuario (`/^[a-z0-9_]{3,20}$/i`) antes de enviarlo. **No hay recuperación de contraseña por correo** (no existe un correo real que reciba nada) — si alguien la olvida, hay que resetearla a mano desde el SQL Editor de Supabase.
+- **En el dashboard de Supabase, "Confirm email" debe estar desactivado** (Authentication → Settings) — los correos sintéticos no existen de verdad y no pueden recibir confirmación. Por la misma razón, ya no se necesita SMTP personalizado (Resend) para esta app; se puede dejar el SMTP por defecto de Supabase sin que importe, porque nunca se envían correos.
+- `src/hooks/useAuth.ts` + `src/components/LoginScreen.tsx` + `src/components/AuthGate.tsx`: sesión, login/signup por usuario y contraseña. `AuthGate` envuelve `<App userId={...} onCerrarSesion={...}>` en `main.tsx` (dentro de `ErrorBoundary` y `BrowserRouter`).
 - `src/hooks/finanzas/usePersistencia.ts`: con `userId === null` (como en **todos** los tests, que llaman `useFinanzas()` sin argumento) es 100% local, idéntico a como era antes de que existiera Supabase — no toca red. Con `userId` real: al montar trae la fila remota (`select ... maybeSingle()`); si no existe, siembra Supabase con lo que hubiera en la llave de `localStorage` **sin dueño** (`finanzas-app-data`, la de antes del login) y la consume (borra) para que no se filtre a otra cuenta. Cada `persistir()` escribe a `localStorage` de forma síncrona y dispara un `upsert` remoto fire-and-forget.
 - **Cada usuario autenticado tiene su propia llave de caché**: `finanzas-app-data:<userId>` (ver `src/utils/storage.ts`). La llave sin sufijo solo se usa en modo local puro y como semilla de migración de una sola vez. Esto se agregó después de un bug real: todas las cuentas en el mismo navegador compartían la llave, así que una cuenta nueva heredaba los datos de la última cuenta usada.
 - Tabla en Supabase: `public.finanzas(user_id uuid primary key references auth.users(id) on delete cascade, data jsonb, updated_at timestamptz)`, con RLS (`auth.uid() = user_id` en select/insert/update). El SQL completo está en el historial de esta conversación si hay que recrearlo.
@@ -24,8 +26,8 @@ Ingreso fijo mensual (se define una sola vez por mes, inmutable), presupuestos p
 
 ## Supabase — configuración del proyecto (dashboard, no código)
 
-- Auth por correo/contraseña, con confirmación de email activada (`Confirm email`).
-- SMTP personalizado configurado con **Resend** (`smtp.resend.com`, sender `onboarding@resend.dev`) porque el servicio de correo gratuito de Supabase tiene un límite muy bajo que se agota rápido en pruebas.
+- Auth por usuario/contraseña (vía correos sintéticos, ver arriba), con **`Confirm email` desactivado** en Authentication → Settings.
+- No hace falta SMTP personalizado (se probó con Resend, pero se abandonó: su dominio sandbox `onboarding@resend.dev` solo entrega al correo dueño de la cuenta Resend, y verificar un dominio propio requiere tener uno comprado, cosa que este proyecto decidió no requerir).
 - `.env.local` (no está en git, cubierto por el patrón `*.local` en `.gitignore`) tiene `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`. Si se clona el repo en otra máquina, hay que recrearlo a mano con esos mismos valores.
 
 ## Deploy (Netlify)

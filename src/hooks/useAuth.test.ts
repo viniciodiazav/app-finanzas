@@ -59,14 +59,14 @@ describe('useAuth', () => {
     expect(result.current.user).toEqual(usuario);
   });
 
-  it('signIn devuelve ok cuando no hay error', async () => {
+  it('signIn convierte el usuario a un correo sintético y devuelve ok cuando no hay error', async () => {
     signInWithPassword.mockResolvedValue({ error: null });
     const { result } = renderHook(() => useAuth());
     await waitFor(() => expect(result.current.cargando).toBe(false));
 
-    const respuesta = await result.current.signIn('a@b.com', 'clave123');
+    const respuesta = await result.current.signIn('Ana', 'clave123');
 
-    expect(signInWithPassword).toHaveBeenCalledWith({ email: 'a@b.com', password: 'clave123' });
+    expect(signInWithPassword).toHaveBeenCalledWith({ email: 'ana@misfinanzas.local', password: 'clave123' });
     expect(respuesta).toEqual({ ok: true });
   });
 
@@ -75,19 +75,19 @@ describe('useAuth', () => {
     const { result } = renderHook(() => useAuth());
     await waitFor(() => expect(result.current.cargando).toBe(false));
 
-    const respuesta = await result.current.signIn('a@b.com', 'mala');
+    const respuesta = await result.current.signIn('ana', 'mala');
 
     expect(respuesta).toEqual({ ok: false, error: 'Credenciales inválidas' });
   });
 
-  it('signUp llama a supabase.auth.signUp', async () => {
+  it('signUp convierte el usuario a un correo sintético y llama a supabase.auth.signUp', async () => {
     signUp.mockResolvedValue({ error: null });
     const { result } = renderHook(() => useAuth());
     await waitFor(() => expect(result.current.cargando).toBe(false));
 
-    const respuesta = await result.current.signUp('nuevo@b.com', 'clave123');
+    const respuesta = await result.current.signUp('nuevo', 'clave123');
 
-    expect(signUp).toHaveBeenCalledWith({ email: 'nuevo@b.com', password: 'clave123' });
+    expect(signUp).toHaveBeenCalledWith({ email: 'nuevo@misfinanzas.local', password: 'clave123' });
     expect(respuesta).toEqual({ ok: true });
   });
 

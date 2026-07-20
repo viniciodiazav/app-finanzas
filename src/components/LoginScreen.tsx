@@ -1,13 +1,15 @@
 import { useState } from 'react';
 
+const USUARIO_VALIDO = /^[a-z0-9_]{3,20}$/i;
+
 interface LoginScreenProps {
-  onIniciarSesion: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  onCrearCuenta: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  onIniciarSesion: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  onCrearCuenta: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
 }
 
 export function LoginScreen({ onIniciarSesion, onCrearCuenta }: LoginScreenProps) {
   const [modo, setModo] = useState<'login' | 'signup'>('login');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -16,14 +18,20 @@ export function LoginScreen({ onIniciarSesion, onCrearCuenta }: LoginScreenProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!email.trim() || !password) {
-      setError('Ingresa tu correo y contraseña.');
+    if (!username.trim() || !password) {
+      setError('Ingresa tu usuario y contraseña.');
+      return;
+    }
+    if (!USUARIO_VALIDO.test(username.trim())) {
+      setError('El usuario debe tener 3-20 caracteres: letras, números o guion bajo.');
       return;
     }
 
     setEnviando(true);
     const resultado =
-      modo === 'login' ? await onIniciarSesion(email.trim(), password) : await onCrearCuenta(email.trim(), password);
+      modo === 'login'
+        ? await onIniciarSesion(username.trim(), password)
+        : await onCrearCuenta(username.trim(), password);
     setEnviando(false);
 
     if (!resultado.ok) {
@@ -56,14 +64,15 @@ export function LoginScreen({ onIniciarSesion, onCrearCuenta }: LoginScreenProps
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-1">Correo</label>
+              <label className="block text-sm font-medium text-slate-600 mb-1">Usuario</label>
               <input
-                type="email"
+                type="text"
                 autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="tu@correo.com"
+                placeholder="usuario"
               />
             </div>
             <div>
